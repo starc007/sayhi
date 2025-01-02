@@ -129,7 +129,6 @@ function Popup() {
     setIsBottomSheetOpen(false);
     setHasAnyKey(true);
 
-    // Re-check API configuration
     const config = await chrome.storage.local.get(["aiConfig"]);
     if (config.aiConfig?.provider === "gemini") {
       await GeminiService.initialize(config.aiConfig.geminiApiKey!);
