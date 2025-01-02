@@ -40,13 +40,10 @@ function Popup() {
           const username = extractUsernameFromUrl(tab.url);
           if (username) {
             const profileData = await TwitterService.getProfile(username);
-            console.log("profileData", profileData);
             const tweetsData = await TwitterService.getRecentTweets(username);
-            console.log("tweetsData", tweetsData);
 
             setProfile(profileData);
             setTweets(tweetsData);
-            // TODO: Generate conversation suggestions based on profile and tweets
           }
         }
       } catch (error) {
@@ -127,9 +124,18 @@ function Popup() {
     }
   };
 
-  const handleApiKeySet = () => {
+  const handleApiKeySet = async () => {
     setIsApiConfigured(true);
     setIsBottomSheetOpen(false);
+    setHasAnyKey(true);
+
+    // Re-check API configuration
+    const config = await chrome.storage.local.get(["aiConfig"]);
+    if (config.aiConfig?.provider === "gemini") {
+      await GeminiService.initialize(config.aiConfig.geminiApiKey!);
+    } else {
+      await ClaudeService.initialize();
+    }
   };
 
   const handleCopy = (text: string) => {
